@@ -1,11 +1,11 @@
 # Rules
-Rules is a simple PHP library which allows you to check nested logical rules. They might come in handy if you need to check user generated rulesets automatically.
+'Rules' is a simple PHP library which allows you to check nested logical rules. They might come in handy if you need to check user generated rulesets automatically.
 
 # Available rules
 
 "Rules" knows two different rule types. Containers (logical operators/junctions) and rules (logical operands).
 
-Container rules:
+container rules:
 
  * AND
  * OR
@@ -17,7 +17,7 @@ rules:
  * True
  * False
 
-Of course you can add your own rules like "User older 18".
+For your own usage you will certainly add own rules like "user age >= X" or "basket amount >= Y".
 
 # Using the rules
 
@@ -75,7 +75,7 @@ The fromArray() method has a second optional parameter "containerType". By defau
 
 # Own rules
 
-You can create own rules quite simple. For containers you should implement the "container" interface, for simple rules the "rule" interface.
+You can create own rules quite easily. For containers you should implement the "container" interface, for simple rules the "rule" interface.
 
     class UserAgeRule implements Rule
     {
@@ -94,10 +94,10 @@ You can create own rules quite simple. For containers you should implement the "
 
 Use this as follows:
 
-    $rule = new AndRule(array(
+    $rule = new AndRule(
         new UserAgeRule($currentUser),
         new SomeOtherRule()
-    ))
+    )
     $rule->validate();
 
 So in order to pass current context information to your rule, you should use the constructor of that rule. If you want your rules to be supported by the RuleBuilder, you should register them to the RuleRegistry:

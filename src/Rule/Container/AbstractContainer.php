@@ -14,8 +14,19 @@ abstract class AbstractContainer implements Container
     /** @var  Rule[] */
     protected $rules;
 
-    public function __construct($rules = null)
+    /**
+     * Constructor params will be used for internal rules
+     *
+     * new ConcreteContainer(
+     *      new TrueRule,
+     *      new FalseRule,
+     * )
+     *
+     */
+    public function __construct()
     {
+        $rules = func_get_args();
+
         if ($rules) {
             $this->rules = $rules;
         }

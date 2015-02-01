@@ -24,6 +24,11 @@ class NotRule extends AbstractContainer
         $this->checkRules();
     }
 
+    /**
+     * Enforce that NOT only handles ONE child rule
+     *
+     * @throws \RuntimeException
+     */
     protected function checkRules()
     {
         if (count($this->rules) > 1) {

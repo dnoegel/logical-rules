@@ -13,6 +13,22 @@ class RuleTest extends PHPUnit_Framework_TestCase
         return new \Dnoegel\Rules\RuleBuilder(new \Dnoegel\Rules\RuleRegistry());
     }
 
+    /**
+     * Ensure that container constructor consumes all func arg rules - and not only the first one
+     */
+    public function testConstructorLength()
+    {
+        $rule = new OrRule(
+            new FalseRule(),
+            new TrueRule()
+        );
+        $this->assertTrue($rule->validate());
+    }
+
+
+    /**
+     * Test creating a rule tree via constructor injection
+     */
     public function testConstructorContainer()
     {
         $rule = new AndRule(
@@ -25,10 +41,12 @@ class RuleTest extends PHPUnit_Framework_TestCase
                 new FalseRule()
             )
         );
-
         $this->assertTrue($rule->validate());
     }
 
+    /**
+     * Test inversion of rule results with the NOT rule
+     */
     public function testNotRule()
     {
         $rule = new NotRule();
@@ -54,6 +72,9 @@ class RuleTest extends PHPUnit_Framework_TestCase
 
     }
 
+    /**
+     * Test logical OR rule container
+     */
     public function testOrRule()
     {
         $rule = $this->getRuleBuilder()->fromArray(array(
@@ -69,6 +90,9 @@ class RuleTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($rule->validate());
     }
 
+    /**
+     * Test logical AND rule container
+     */
     public function testAndRule()
     {
         $rule = $this->getRuleBuilder()->fromArray(array(
@@ -84,6 +108,9 @@ class RuleTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($rule->validate());
     }
 
+    /**
+     * Test logical XOR rule container
+     */
     public function testXorRule()
     {
         $rule = $this->getRuleBuilder()->fromArray(array(
