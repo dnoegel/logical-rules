@@ -23,7 +23,7 @@ Of course you can add your own rules like "User older 18".
 
 ## Instantiation
 
-You can simply instantiate your rules and nest them as this:
+You can simply instantiate your rules and nest them like this:
 
     $rule = new AndRule(
         new TrueRule(),
@@ -114,4 +114,44 @@ So in order to pass current context information to your rule, you should use the
     $rule->validate();
 
 ## Rule configuration
+
+Especially if the rules are somehow user generated, you might need some additional configuration. So instead of having a "user is older then 18" rule, you want a "user is older then X" rule.
+While this is no problem when instantiating the rule objects manually, you might want to have a way, to automatically configure your rule from within the fromArray() method.
+
+For this you can implement the ConfigAware interface:
+
+    class MinimumAgeRule implements Rule, ConfigAware
+    {
+        protected $user;
+        protected $minAge;
+
+        public function __construct($user)
+        {
+            $this->user = $user;
+        }
+
+        public function setConfig($config)
+        {
+            $this->minAge = $config;
+        }
+
+        public function validate()
+        {
+            return $this->user->getAge() >= $this->minAge;
+        }
+    }
+
+
+Now you are able to configure your rules like this:
+
+    $registry = new RuleRegistry();
+    $registry->add('minimumAge', new MinimumAgeRule($currentUser));
+    $registry->add('someOtherRule', new SomeOtherRule());
+
+    $builder = new RuleBuilder($registry);
+    $rule = $builder->fromArray(array(
+        'minimumAge' => 21,
+        'maximumAge' => 44
+    ));
+    $rule->validate();
 
