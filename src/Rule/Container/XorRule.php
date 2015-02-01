@@ -16,8 +16,7 @@ class XorRule extends AbstractContainer
         $true = 0;
         foreach ($this->rules as $rule) {
             if ($rule->validate()) {
-                $true ++;
-                if ($true > 1) {
+                if (++$true > 1) {
                     return false;
                 }
             }
@@ -25,5 +24,4 @@ class XorRule extends AbstractContainer
 
         return $true == 1;
     }
-
 }

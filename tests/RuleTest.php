@@ -1,5 +1,6 @@
 <?php
 
+use Dnoegel\Rules\Rule\CompareRule;
 use Dnoegel\Rules\Rule\Container\AndRule;
 use Dnoegel\Rules\Rule\Container\NotRule;
 use Dnoegel\Rules\Rule\Container\OrRule;
@@ -132,5 +133,34 @@ class RuleTest extends PHPUnit_Framework_TestCase
             'true'
         ), 'xor');
         $this->assertFalse($rule->validate());
+    }
+
+
+    public function testCompareRule()
+    {
+        $rule = new CompareRule(3, '<=', 5);
+        $this->assertTrue($rule->validate());
+
+        $rule = new CompareRule(100, '<', 4);
+        $this->assertFalse($rule->validate());
+
+        $rule = new CompareRule(100, '>', 100);
+        $this->assertFalse($rule->validate());
+
+        $rule = new CompareRule(100, '>=', 100);
+        $this->assertTrue($rule->validate());
+
+        $rule = new CompareRule(4, '=', 4);
+        $this->assertTrue($rule->validate());
+
+        $rule = new CompareRule(4, '=', 5);
+        $this->assertFalse($rule->validate());
+
+        $rule = new CompareRule(4, '!=', 5);
+        $this->assertTrue($rule->validate());
+
+        $rule = new CompareRule(5, '<>', 5);
+        $this->assertFalse($rule->validate());
+
     }
 }
