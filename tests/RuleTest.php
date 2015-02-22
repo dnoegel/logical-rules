@@ -11,7 +11,7 @@ class RuleTest extends PHPUnit_Framework_TestCase
 {
     private function getRuleBuilder()
     {
-        return new \Dnoegel\Rules\RuleBuilder(new \Dnoegel\Rules\RuleRegistry());
+        return new \Dnoegel\Rules\RuleBuilder(new \Dnoegel\Rules\Registry\Registry());
     }
 
     /**

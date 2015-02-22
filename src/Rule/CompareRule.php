@@ -10,7 +10,7 @@ use Dnoegel\Rules\Rule;
  * Class CompareRule
  * @package Dnoegel\Rules\Rule
  */
-class CompareRule implements Rule, ConfigAware
+class CompareRule implements Rule
 {
     /**
      * @var
@@ -28,15 +28,6 @@ class CompareRule implements Rule, ConfigAware
         $this->leftOperand = $leftOperand;
         $this->operator = $operator;
         $this->rightOperand = $rightOperand;
-    }
-
-    /**
-     * @param $config
-     * @return mixed
-     */
-    public function setConfig($config)
-    {
-        $this->rightOperand = $config;
     }
 
     /**

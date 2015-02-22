@@ -1,23 +1,21 @@
 <?php
+use Dnoegel\Rules\Registry\Type\Callback;
 use Dnoegel\Rules\Rule;
 
-class BasketAmountRule implements Rule\ConfigAware, Rule
+class BasketAmountRule implements Rule
 {
     private $currentAmount;
-    private $config;
-    public function __construct($currentAmount)
+    private $maxAmount;
+
+    public function __construct($currentAmount, $maxAmount)
     {
         $this->currentAmount = $currentAmount;
-    }
-
-    public function setConfig($config)
-    {
-        $this->config = $config;
+        $this->maxAmount = $maxAmount;
     }
 
     public function validate()
     {
-        return $this->currentAmount <= $this->config;
+        return $this->currentAmount <= $this->maxAmount;
     }
 }
 
@@ -26,24 +24,46 @@ class RuleBuilderTest extends PHPUnit_Framework_TestCase
 
     public function testRuleBuilder()
     {
-        $registry = new \Dnoegel\Rules\RuleRegistry();
-        $registry->add('maxAmount', new BasketAmountRule(100));
+        $registry = new \Dnoegel\Rules\Registry\Registry();
+        $currentBasketAmount = 199;
+        $registry->add('maxAmountWithCallable', new Callback(
+                function ($maxAmount) use ($currentBasketAmount) {
+                    return new BasketAmountRule($currentBasketAmount, $maxAmount);
+                }
+            )
+        );
         $registry->add('true', new Rule\TrueRule());
         $registry->add('false', new Rule\FalseRule());
 
         $builder = new \Dnoegel\Rules\RuleBuilder($registry);
 
         $result = $builder->fromArray(array(
-                'and' => array(
-                    'maxAmount' => 300,
-                    new Rule\TrueRule()
-                ),
-                'or' => array(
-                    'false',
-                    new Rule\TrueRule()
-                )
+            'and' => array(
+                'maxAmountWithCallable' => 200,
+                new Rule\TrueRule()
+            ),
+            'or' => array(
+                'false',
+                new Rule\TrueRule()
+            )
         ));
 
         $this->assertTrue($result->validate());
+    }
+
+    public function testRuleBuilderWithArrayValue()
+    {
+        $registry = new \Dnoegel\Rules\Registry\Registry();
+        $registry->add('test', new Callback(
+                function ($x) {
+                    return new Rule\TrueRule();
+                }
+            )
+        );
+
+        $builder = new \Dnoegel\Rules\RuleBuilder($registry);
+        $builder->fromArray(array(
+            'test' => array(1, 2, 3)
+        ));
     }
 }

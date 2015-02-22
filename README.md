@@ -16,6 +16,7 @@ rules:
 
  * True
  * False
+ * Compare
 
 For your own usage you will certainly add own rules like "user age >= X" or "basket amount >= Y".
 
@@ -100,11 +101,15 @@ Use this as follows:
     )
     $rule->validate();
 
-So in order to pass current context information to your rule, you should use the constructor of that rule. If you want your rules to be supported by the RuleBuilder, you should register them to the RuleRegistry:
+In order to pass current context information to your rule, you should use the constructor of that rule.
+
+## RuleRegistry
+
+If you want your rules to be supported by the RuleBuilder, you should register them to the RuleRegistry:
 
     $registry = new RuleRegistry();
     $registry->add('age', new UserAgeRule($currentUser));
-    $registry->add('someOtherRule', new SomeOtherRule());
+    $registry->add('someOtherRule', new Callback(function() { return new SomeOtherRule(); }));
 
     $builder = new RuleBuilder($registry);
     $rule = $builder->fromArray(array(
@@ -113,26 +118,33 @@ So in order to pass current context information to your rule, you should use the
     ));
     $rule->validate();
 
+There are generally two ways to register your rule: You can register an instance of your object
+
+    $registry->add('age', new UserAgeRule($currentUser));
+
+or you can register a callable which returns an instance of your rule:
+
+    $registry->add('someOtherRule', new Callback(function() { return new SomeOtherRule(); }));
+
+Registering a callable has some advantages over registering an actual instance:
+
+ * lazy instantiation: your rule will only be created when needed. Especially useful if you need some expensive calculation for your rule
+ * context: when used with the RuleBuilder, you will receive the "config" info in the callback function
+ * no cloning needed
+
 ## Rule configuration
 
 Especially if the rules are somehow user generated, you might need some additional configuration. So instead of having a "user is older then 18" rule, you want a "user is older then X" rule.
 While this is no problem when instantiating the rule objects manually, you might want to have a way, to automatically configure your rule from within the fromArray() method.
 
-For this you can implement the ConfigAware interface:
-
-    class MinimumAgeRule implements Rule, ConfigAware
+    class MinimumAgeRule implements Rule
     {
         protected $user;
         protected $minAge;
 
-        public function __construct($user)
+        public function __construct($user, $minAge)
         {
             $this->user = $user;
-        }
-
-        public function setConfig($config)
-        {
-            $this->minAge = $config;
         }
 
         public function validate()
@@ -145,7 +157,7 @@ For this you can implement the ConfigAware interface:
 Now you are able to configure your rules like this:
 
     $registry = new RuleRegistry();
-    $registry->add('minimumAge', new MinimumAgeRule($currentUser));
+    $registry->add('minimumAge', new Callback(function($minAge) use($currentUser) { return new MinimumAgeRule($currentUser, $minAge); } ));
     $registry->add('someOtherRule', new SomeOtherRule());
 
     $builder = new RuleBuilder($registry);
@@ -155,3 +167,4 @@ Now you are able to configure your rules like this:
     ));
     $rule->validate();
 
+In this case, $currentUser is an object we know in our business logic - so we can just USE it in the callable. $minAge - on the other hand - comes from the nested array object, and is only known during the fromArray() method. As it is passed to our callable, its easy to access
