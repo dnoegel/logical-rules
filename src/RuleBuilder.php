@@ -54,13 +54,16 @@ class RuleBuilder
         } elseif ($value instanceof Rule) {
             // instance of rule
             return $value;
-        } elseif (is_numeric($name) && is_string($value)) {
-            // numeric $name && string $value => only the name of a rule was passed
-            // e.g. 'false'
-            return $this->ruleRegistry->get($value);
-        } elseif (is_string($name)) {
-            // e.g. 'maxAmount' => 300
-            return $this->ruleRegistry->get($name, $value);
         }
+
+        // If only a rule name was passed, normalize the form
+        // e.g. array('false')
+        if (is_numeric($name) && is_string($value)) {
+            $name = $value;
+            $value = null;
+        }
+
+        // any other form like array('myRule' => 333)
+        return $this->ruleRegistry->get($name, $value);
     }
 }
