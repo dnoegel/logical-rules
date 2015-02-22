@@ -28,6 +28,10 @@ class Instance implements Type
         $this->isContainer = $isContainer;
     }
 
+    /**
+     * @param $config
+     * @return \Dnoegel\Rules\Rule
+     */
     public function get($config)
     {
         return clone $this->rule;

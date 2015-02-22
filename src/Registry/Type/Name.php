@@ -27,6 +27,10 @@ class Name implements Type
         $this->isContainer = $isContainer;
     }
 
+    /**
+     * @param $config
+     * @return \Dnoegel\Rules\Rule
+     */
     public function get($config)
     {
         if ($this->isContainer) {

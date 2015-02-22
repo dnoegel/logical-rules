@@ -2,6 +2,8 @@
 
 namespace Dnoegel\Rules\Registry;
 
+use Dnoegel\Rules\Rule;
+
 /**
  * Type represents a registry type. Its basically a wrapper for for a rule in the rule registry
  * and takes care of the proper instantiation of a new rule object in the get method.

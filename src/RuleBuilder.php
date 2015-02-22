@@ -33,22 +33,34 @@ class RuleBuilder
         $container = $this->ruleRegistry->get($containerType);
 
         foreach ($array as $name => $value) {
-            if (is_array($value) && $this->ruleRegistry->isContainer($name)) {
-                // array = container. Build it by recursively the fromArray method
-                $container->addRule($this->fromArray($value, $name));
-            } elseif ($value instanceof Rule) {
-                // instance of rule
-                $container->addRule($value);
-            } elseif (is_numeric($name) && is_string($value)) {
-                // numeric $name && string $value => only the name of a rule was passed
-                // e.g. 'false'
-                $container->addRule($this->ruleRegistry->get($value));
-            } elseif (is_string($name)) {
-                // e.g. 'maxAmount' => 300
-                $container->addRule($this->ruleRegistry->get($name, $value));
-            }
+            $container->addRule($this->getRule($name, $value));
         }
 
         return $container;
+    }
+
+    /**
+     * Return a rule object depending on the current array element
+     *
+     * @param $name
+     * @param $value
+     * @return Rule|Container
+     */
+    private function getRule($name, $value)
+    {
+        if (is_array($value) && $this->ruleRegistry->isContainer($name)) {
+            // array = container. Build it by recursively the fromArray method
+            return $this->fromArray($value, $name);
+        } elseif ($value instanceof Rule) {
+            // instance of rule
+            return $value;
+        } elseif (is_numeric($name) && is_string($value)) {
+            // numeric $name && string $value => only the name of a rule was passed
+            // e.g. 'false'
+            return $this->ruleRegistry->get($value);
+        } elseif (is_string($name)) {
+            // e.g. 'maxAmount' => 300
+            return $this->ruleRegistry->get($name, $value);
+        }
     }
 }
