@@ -1,6 +1,8 @@
 <?php
 
 use Dnoegel\Rules\Registry\Type\Callback;
+use Dnoegel\Rules\Registry\Type\Instance;
+use Dnoegel\Rules\Registry\Type\Name;
 
 class TestRule implements \Dnoegel\Rules\Rule
 {
@@ -28,7 +30,7 @@ class RuleRegistryTest extends PHPUnit_Framework_TestCase
         return new \Dnoegel\Rules\Registry\Registry();
     }
 
-    public function testClosure()
+    public function testTypeCallbackClosure()
     {
         $registry = $this->getRuleRegistry();
         $registry->add('test', new Callback(function () {
@@ -38,18 +40,32 @@ class RuleRegistryTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($registry->get('test')->validate());
     }
 
-    public function testStatic()
+    public function testTypeCallbackStatic()
     {
         $registry = $this->getRuleRegistry();
         $registry->add('test2', new Callback(array('RuleFactory', 'getTestRule')));
         $this->assertTrue($registry->get('test2')->validate());
     }
 
-    public function testInstance()
+    public function testTypeCallbackInstance()
     {
         $registry = $this->getRuleRegistry();
         $registry->add('test3', new Callback(array(new RuleFactory(), 'getTestRule')));
         $this->assertTrue($registry->get('test3')->validate());
+    }
+
+    public function testTypeInstance()
+    {
+        $registry = $this->getRuleRegistry();
+        $registry->add('test4', new Instance(new TestRule()));
+        $this->assertTrue($registry->get('test4')->validate());
+    }
+
+    public function testTypeName()
+    {
+        $registry = $this->getRuleRegistry();
+        $registry->add('test5', new Name('TestRule'));
+        $this->assertTrue($registry->get('test5')->validate());
     }
 
     /**

@@ -57,7 +57,7 @@ class RuleBuilder
         }
 
         // If only a rule name was passed, normalize the form
-        // e.g. array('false')
+        // e.g. array('false') is normalized to $name = 'false'
         if (is_numeric($name) && is_string($value)) {
             $name = $value;
             $value = null;
